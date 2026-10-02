@@ -1,11 +1,8 @@
-import { calendar_v3 } from "@googleapis/calendar";
-import { OAuth2Client, JWT } from "googleapis-common";
-
 import { triggerDelegationCredentialErrorWebhook } from "@calcom/features/webhooks/lib/triggerDelegationCredentialErrorWebhook";
 import {
   CalendarAppDelegationCredentialClientIdNotAuthorizedError,
-  CalendarAppDelegationCredentialInvalidGrantError,
   CalendarAppDelegationCredentialError,
+  CalendarAppDelegationCredentialInvalidGrantError,
 } from "@calcom/lib/CalendarAppError";
 import {
   APP_CREDENTIAL_SHARING_ENABLED,
@@ -16,13 +13,15 @@ import {
 import logger from "@calcom/lib/logger";
 import type { Prisma } from "@calcom/prisma/client";
 import type { CredentialForCalendarServiceWithEmail } from "@calcom/types/Credential";
-
+import { calendar_v3 } from "@googleapis/calendar";
+import { JWT, OAuth2Client } from "googleapis-common";
 import { invalidateCredential } from "../../_utils/invalidateCredential";
 import { OAuthManager } from "../../_utils/oauth/OAuthManager";
 import { oAuthManagerHelper } from "../../_utils/oauth/oAuthManagerHelper";
 import { OAuth2UniversalSchema } from "../../_utils/oauth/universalSchema";
 import { metadata } from "../_metadata";
 import { getGoogleAppKeys } from "./getGoogleAppKeys";
+import { getGoogleCalendarRetryConfig } from "./getGoogleCalendarRetryConfig";
 
 type DelegatedTo = NonNullable<CredentialForCalendarServiceWithEmail["delegatedTo"]>;
 const log = logger.getSubLogger({ prefix: ["app-store/googlecalendar/lib/CalendarAuth"] });
@@ -216,7 +215,7 @@ export class CalendarAuth {
           statusText: result.statusText,
         });
       },
-      isTokenObjectUnusable: async function (response) {
+      isTokenObjectUnusable: async (response) => {
         // TODO: Confirm that if this logic should go to isAccessTokenUnusable
         if (!response.ok || (response.status < 200 && response.status >= 300)) {
           const responseBody = await response.json();
@@ -303,6 +302,7 @@ export class CalendarAuth {
 
     return new calendar_v3.Calendar({
       auth: googleAuthClient,
+      retryConfig: getGoogleCalendarRetryConfig(),
     });
   }
 }
