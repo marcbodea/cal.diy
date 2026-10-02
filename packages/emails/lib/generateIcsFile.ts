@@ -1,8 +1,6 @@
+import type { CalendarEvent } from "@calcom/types/Calendar";
 import type { TFunction } from "i18next";
 import type { EventStatus } from "ics";
-
-import type { CalendarEvent } from "@calcom/types/Calendar";
-
 import generateIcsString from "./generateIcsString";
 
 export enum GenerateIcsRole {
@@ -36,6 +34,6 @@ export default function generateIcsFile({
       status,
       t,
     }),
-    method: "REQUEST",
+    method: status === "CANCELLED" ? "CANCEL" : "REQUEST",
   };
 }
