@@ -1,13 +1,11 @@
-import { describe, expect, vi } from "vitest";
-
 import { ORGANIZER_EMAIL_EXEMPT_DOMAINS } from "@calcom/lib/constants";
 import { ErrorCode } from "@calcom/lib/errorCodes";
 import { ErrorWithCode } from "@calcom/lib/errors";
-import { buildCalendarEvent, buildPerson } from "@calcom/lib/test/builder";
-import { buildVideoCallData } from "@calcom/lib/test/builder";
-import type { CalendarEvent } from "@calcom/types/Calendar";
+import { buildCalendarEvent, buildPerson, buildVideoCallData } from "@calcom/lib/test/builder";
 import { test } from "@calcom/testing/lib/fixtures/fixtures";
-
+import type { CalendarEvent } from "@calcom/types/Calendar";
+import { describe, expect, vi } from "vitest";
+import generateIcsFile, { GenerateIcsRole } from "./generateIcsFile";
 import generateIcsString from "./generateIcsString";
 
 const assertHasIcsString = (icsString: string | undefined) => {
@@ -46,6 +44,9 @@ const testIcsStringContains = ({
   }
   expect(icsString).toEqual(expect.stringContaining(`DTEND:${DTEND}`));
   expect(icsString).toEqual(expect.stringContaining(`STATUS:${status}`));
+  expect(icsString).toEqual(
+    expect.stringContaining(`METHOD:${status === "CANCELLED" ? "CANCEL" : "REQUEST"}`)
+  );
   //   Getting an error expected icsString to deeply equal stringMatching
   //   for (const attendee of event.attendees) {
   //     expect(icsString).toEqual(
@@ -55,6 +56,22 @@ const testIcsStringContains = ({
   //     );
   //   }
 };
+
+describe("generateIcsFile", () => {
+  test.each([
+    { status: "CANCELLED" as const, method: "CANCEL" },
+    { status: "CONFIRMED" as const, method: "REQUEST" },
+  ])("keeps the attachment and calendar methods consistent for $status", ({ status, method }) => {
+    const file = generateIcsFile({
+      calEvent: buildCalendarEvent({ attendees: [buildPerson()] }),
+      role: GenerateIcsRole.ATTENDEE,
+      status,
+    });
+
+    expect(file?.method).toBe(method);
+    expect(file?.content).toContain(`METHOD:${method}`);
+  });
+});
 
 describe("generateIcsString", () => {
   describe("booking actions", () => {
