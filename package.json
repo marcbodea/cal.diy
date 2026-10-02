@@ -95,7 +95,7 @@
     "@snaplet/copycat": "4.1.0",
     "@testing-library/jest-dom": "5.17.0",
     "@testing-library/react": "16.0.1",
-    "@vitest/ui": "4.0.16",
+    "@vitest/ui": "4.1.11",
     "c8": "7.13.0",
     "checkly": "latest",
     "dotenv-checker": "1.1.5",
@@ -113,7 +113,7 @@
     "tsc-absolute": "1.0.0",
     "turbo": "2.7.1",
     "typescript": "5.9.3",
-    "vitest": "4.0.16",
+    "vitest": "4.1.11",
     "vitest-fetch-mock": "0.4.5",
     "vitest-mock-extended": "3.1.0"
   },
@@ -204,7 +204,11 @@
     "ajv@^6.12.5": "6.14.0",
     "brace-expansion@^5.0.2": "5.0.5",
     "brace-expansion@^2.0.1": "2.0.3",
-    "brace-expansion@^2.0.2": "2.0.3"
+    "brace-expansion@^2.0.2": "2.0.3",
+    "protobufjs": "7.6.6",
+    "follow-redirects": "1.16.1",
+    "shell-quote": "1.11.0",
+    "i18next-fs-backend": "2.6.8"
   },
   "packageExtensions": {
     "ink@3.2.0": {
