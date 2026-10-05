@@ -57,3 +57,13 @@ Before production deployment:
 6. Verify the running image revision, completed migrations, login, booking/event-type visibility, integration connections, reminder settings, and application logs. An intentional end-to-end test booking requires calendar/email side effects.
 
 Keep the old image available for rollback. Never use `docker compose down -v`, database reset commands, or the newer Cal.diy table-removal migrations. Existing bookings with missing external event references require separate reconciliation; these backports do not recreate them.
+
+For upgrades of an existing installation, set the application Compose command to
+`["/calcom/scripts/start-preserve-data.sh"]`. This runs migrations with fail-fast
+behavior and skips the deprecated app-store seeder, which would otherwise
+overwrite integration keys, enabled settings, and credential mappings.
+
+The manual **Full-featured image** workflow publishes an AMD64 image to GHCR tagged
+with the source commit. It uses a disposable build database and no production
+credentials. Deploy the resulting immutable digest after the isolated runtime
+checks; publication alone does not mean the image is production-verified.
